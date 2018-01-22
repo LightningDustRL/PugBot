@@ -3,8 +3,7 @@
   "version": "0.0.1",
   "description": "Discord Bot for setting up pick up games in Pavlov",
   "dependencies": {
-    "discord.io": "^2.5.3",
-    "lodash": "^4.17.4",
-    "winston": "^2.4.0"
+    "discord.io": "git://github.com/woor/discord.io.git#gateway_v6",
+    "lodash": "^4.17.4"
   }
 }
