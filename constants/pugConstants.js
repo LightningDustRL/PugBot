@@ -1,10 +1,15 @@
 var pugConstants = {
-  INACTIVE: 'No Pug',
-  JOINING: 'Players are joining the pug',
-  FULL_NOT_READY: 'All pug slots taken, not all players ready',
-  PLAYERS_READY: 'All players are ready, wait for the host',
+  INACTIVE: 'No Pug being set up.',
+  SETUP: 'Pug setup in progress.',
+  FULL_NOT_READY: 'Pug is currently full.',
+  PLAYERS_READY: 'All players are ready.',
   NA: 'North America',
-  EU: 'Europe'
+  EU: 'Europe',
+  AP: 'Asia-Pacific'
+}
+
+var botMessages = {
+
 }
 
 module.exports = pugConstants;
