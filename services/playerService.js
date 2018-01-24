@@ -1,64 +1,68 @@
-var _ = require('lodash');
-var pugConstants = require('../constants/pugConstants');
+'use strict';
 
-var players = [];
-var playerService = {
-  getPlayers: function () {
+const _ = require('lodash');
+const pugConstants = require('../constants/pugConstants');
+
+let players = [];
+const playerService = {
+  getPlayers: () => {
     return players;
   },
-  addPlayer: function (user, userId, isHost) {
-    var player = {
+  getHost: () => {
+    return _.find(playerService.getPlayers(), (player) => {return player.isHost === true});
+  },
+  addPlayer: (user, userId, isHost) => {
+    let player = {
       username: user,
       id: userId,
       isHost: isHost,
       isReady: false
     };
     players.push(player);
+    console.log(JSON.stringify(players));
   },
-  removePlayer: function (userId) {
-  // TODO: DOES NOT WORK FIX THIS
-    players = _.remove(players, function (player) {
-      console.log(JSON.stringify(player));
-      return player.id === userId
+  removePlayer: (userId) => {
+    _.remove(players, (player) => {
+      return player.id === userId;
     });
-    console.log('Remove user: ' + userId);
+    console.log(JSON.stringify(players));
   },
-  readyPlayer: function (userId) {
-    var playerIndex = _.findIndex(players, function(player) {return player.id === userId});
+  readyPlayer: (userId) => {
+    const playerIndex = _.findIndex(players, (player) => {return player.id === userId});
     players[playerIndex].isReady = true;
     console.log('Ready player: ' + JSON.stringify(players[playerIndex]));
   },
-  unreadyPlayer: function(userId) {
-    var playerIndex = _.findIndex(players, function(player) {return player.id === userId});
+  unreadyPlayer: (userId) => {
+    const playerIndex = _.findIndex(players, (player) => {return player.id === userId});
     players[playerIndex].isReady = false;
     console.log('Unready player: ' + JSON.stringify(players[playerIndex]));
   },
-  clearPlayers: function () {
+  clearPlayers: () => {
     players = [];
     return players;
   },
-  getPlayerCount: function () {
+  getPlayerCount: () => {
     return players.length;
   },
-  getReadyPlayerNames: function () {
-  var readyPlayers = [];
-    _.forEach(_.filter(players, function(player) {return player.isReady;}), function(player) {
+  getReadyPlayerNames: () => {
+  let readyPlayers = [];
+    _.forEach(_.filter(players, (player) => {return player.isReady;}), (player) => {
       readyPlayers.push(player.username);
     });
     return readyPlayers;
   },
-  getUnreadyPlayerNames: function () {
-    var unreadyPlayers = [];
-    _.forEach(_.filter(players, function(player) {return !player.isReady;}), function(player) {
+  getUnreadyPlayerNames: () => {
+    let unreadyPlayers = [];
+    _.forEach(_.filter(players, (player) => {return !player.isReady;}), (player) => {
       unreadyPlayers.push(player.username);
     });
     return unreadyPlayers;
   },
-  findPlayer: function (userId) {
-    return _.find(playerService.getPlayers(), function (player) {return userId === player.id});
+  findPlayer: (userId) => {
+    return _.find(playerService.getPlayers(), (player) => {return userId === player.id});
   },
-  playerExists: function (userId) {
-    if (this.findPlayer(userId) !== undefined) {
+  playerExists: (userId) => {
+    if (playerService.findPlayer(userId) !== undefined) {
       return true;
     }
     return false;

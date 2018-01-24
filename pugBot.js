@@ -1,23 +1,25 @@
-var Discord = require('discord.io');
-var _ = require('lodash');
-var auth = require('./auth.json');
-var pugConstants = require('./constants/pugConstants');
-var playerService = require('./services/playerService');
+'use strict';
 
-var mapSettings;
-var status;
-var region;
+const Discord = require('discord.io');
+const _ = require('lodash');
+const auth = require('./auth.json');
+const pugConstants = require('./constants/pugConstants');
+const playerService = require('./services/playerService');
 
-var pugBot = new Discord.Client({
+let mapSettings;
+let status;
+let region;
+
+const pugBot = new Discord.Client({
   token: auth.token,
   autorun: true
 });
 
-var setDefaultPugValues = function () {
+let setDefaultPugValues = function () {
   console.log('RESET INVOKED');
   mapSettings= [];
   mapSettings.push({mapName: 'Dust 2', mapVotes: 0});
-  players = playerService.clearPlayers;
+  playerService.clearPlayers();
   status = pugConstants.INACTIVE;
 }
 
@@ -30,11 +32,11 @@ pugBot.on('ready', function (evt) {
 
 pugBot.on('message', function (user, userId, channelId, message, evt) {
   if (message.charAt(0) === '.') {
-    var args = message.substring(1).split(' ');
-    var cmd = args[0];
+    let args = message.substring(1).split(' ');
+    let cmd = args[0];
 
     args = args.splice(1);
-    var pugSettings = {
+    let pugSettings = {
       players: playerService.getPlayers,
       mapSettings: mapSettings,
       serverRegion: region,
@@ -59,8 +61,7 @@ pugBot.on('message', function (user, userId, channelId, message, evt) {
           if(!playerService.playerExists(userId)) {
             playerService.addPlayer(user, userId, false, channelId);
             pugBot.sendMessage({to: channelId, message: user + ' has joined the pug ' + playerService.getPlayerCount() + '/10 have Joined'});
-            console.log(players);
-            if (players.length === 10) {
+            if (playerService.getPlayerCount() === 10) {
               status = pugConstants.FULL_NOT_READY;
               pugBot.sendMessage({to: channelId, message: 'All slots claimed, ready up to begin'});
             }
@@ -109,8 +110,8 @@ pugBot.on('message', function (user, userId, channelId, message, evt) {
         }
       break;
       case 'players':
-        var readyPlayers = playerService.getReadyPlayerNames();
-        var unreadyPlayers = playerService.getUnreadyPlayerNames();
+        let readyPlayers = playerService.getReadyPlayerNames();
+        let unreadyPlayers = playerService.getUnreadyPlayerNames();
         pugBot.sendMessage({to: channelId, message: 'Ready players: ' + JSON.stringify(readyPlayers)});
         pugBot.sendMessage({to: channelId, message: 'Unready players: ' + JSON.stringify(unreadyPlayers)});
       break;
@@ -132,11 +133,10 @@ pugBot.on('message', function (user, userId, channelId, message, evt) {
         //TODO
       break;
       case 'help':
-        var helpMessage; // TODO: write this
-        pugBot.sendMessage(channelId, helpMessage);
+        pugBot.sendMessage({to: channelId, message: pugConstants.HELP_MESSAGE});
       break;
       case 'status':
-        pugBot.sendMessage( channelId, JSON.stringify(pugSettings.status));
+        pugBot.sendMessage({to: channelId, message: JSON.stringify(pugSettings.status)});
       break;
      }
   }
