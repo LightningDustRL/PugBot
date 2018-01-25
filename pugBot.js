@@ -5,64 +5,45 @@ const _ = require('lodash');
 const auth = require('./auth.json');
 const pugConstants = require('./constants/pugConstants');
 const playerService = require('./services/playerService');
-
-let mapSettings;
-let status;
-let region;
+const pugService = require('./services/pugService');
 
 const pugBot = new Discord.Client({
   token: auth.token,
   autorun: true
 });
 
-let setDefaultPugValues = function () {
-  console.log('RESET INVOKED');
-  mapSettings= [];
-  mapSettings.push({mapName: 'Dust 2', mapVotes: 0});
-  playerService.clearPlayers();
-  status = pugConstants.INACTIVE;
-}
-
-pugBot.on('ready', function (evt) {
+pugBot.on('ready',(evt) => {
  console.log('Connected');
  console.log('Logged in as: ');
  console.log(pugBot.username + ' - (' + pugBot.id + ')');
- setDefaultPugValues();
 });
 
-pugBot.on('message', function (user, userId, channelId, message, evt) {
+pugBot.on('message', (user, userId, channelId, message, evt) => {
   if (message.charAt(0) === '.') {
     let args = message.substring(1).split(' ');
     let cmd = args[0];
-
     args = args.splice(1);
-    let pugSettings = {
-      players: playerService.getPlayers,
-      mapSettings: mapSettings,
-      serverRegion: region,
-      status: status
-    }
 
     switch(cmd) {
       case 'setup':
-        if (pugSettings.status !== pugConstants.INACTIVE) {
+        if (pugService.getStatus() !== pugConstants.INACTIVE) {
           pugBot.sendMessage({to: channelId, message: 'Pug setup already in progress. Type \".join\" to join'});
           break;
         }
-        playerService.addPlayer(user, userId, true);
-        status = pugConstants.SETUP;
+        pugService.setupPug(user, userId);
         pugBot.sendMessage({to: channelId, message: user + ' is starting a pug! Type \".join\" to join in.'});
       break;
+
       case 'join':
         // player added to pug roster
-        if (pugSettings.status === pugConstants.FULL_NOT_READY || pugSettings.Status === pugConstants.PLAYERS_READY) {
+        if (pugService.getStatus() === pugConstants.FULL_NOT_READY || pugService.getStatus() === pugConstants.PLAYERS_READY) {
           pugBot.sendMessage({to: channelId, message: 'Sorry, this pug is full'});
         } else {
           if(!playerService.playerExists(userId)) {
             playerService.addPlayer(user, userId, false, channelId);
             pugBot.sendMessage({to: channelId, message: user + ' has joined the pug ' + playerService.getPlayerCount() + '/10 have Joined'});
             if (playerService.getPlayerCount() === 10) {
-              status = pugConstants.FULL_NOT_READY;
+              pugService.setStatus(pugConstants.FULL_NOT_READY);
               pugBot.sendMessage({to: channelId, message: 'All slots claimed, ready up to begin'});
             }
           } else{
@@ -71,6 +52,7 @@ pugBot.on('message', function (user, userId, channelId, message, evt) {
           }
         }
       break;
+
       case 'leave':
         // player is removed from pug roster
         if (!playerService.playerExists(userId)) {
@@ -85,6 +67,7 @@ pugBot.on('message', function (user, userId, channelId, message, evt) {
             + playerService.getPlayerCount() + '/10 have Joined'});
         }
       break;
+
       case 'ready':
         console.log('Ready player ' + user);
         // player is ready for match to begin
@@ -98,7 +81,31 @@ pugBot.on('message', function (user, userId, channelId, message, evt) {
             message: user + ' is ready to begin.'
           });
         }
+        if (playerService.getReadyPlayerNames().length === 10) {
+          _.forEach(playerService.getPlayers(), (player) => {
+            console.log('Opening DM with ' + player.username);
+            pugBot.createDMChannel(userId, (err, res) => {
+              if (err) {
+                console.log(err);
+              } else {
+                if (player !== playerService.getHost()) {
+                  pugBot.sendMessage({to: res.id, message: `Pug is starting! Match host is ${playerService.getHost().username}
+                      on ${pugService.getPugSettings().map.mapName} in the ${pugService.getRegion()} region. Passcode is
+                      ${pugService.getPasscode()}. Players are ${playerService.getReadyPlayerNames()}.`}
+                  );
+                } else {
+                  pugBot.sendMessage({to: res.id, message: `Pug is starting and you are the host. Host a game on the
+                      ${pugService.getRegion()} server on ${pugService.getPugSettings().map.mapName}, with the password
+                      ${pugService.getPasscode()} and start the match when everyone has connected.`
+                  });
+                }
+               }
+            });
+          });
+          console.log(`Pug has begun, clearing player list and resetting pug to default values`)
+        }
       break;
+
       case 'unready':
         console.log('Unready player ' + user);
         if (!playerService.playerExists(userId)) {
@@ -109,35 +116,66 @@ pugBot.on('message', function (user, userId, channelId, message, evt) {
           pugBot.sendMessage({to: channelId, message: user + ' is not ready to begin.'});
         }
       break;
+
       case 'players':
         let readyPlayers = playerService.getReadyPlayerNames();
         let unreadyPlayers = playerService.getUnreadyPlayerNames();
         pugBot.sendMessage({to: channelId, message: 'Ready players: ' + JSON.stringify(readyPlayers)});
         pugBot.sendMessage({to: channelId, message: 'Unready players: ' + JSON.stringify(unreadyPlayers)});
       break;
+
       case 'setRegion':
         //Set Region for pug
-        if (args[1] && (args[1] === pugConstants.NA || args[1] === pugConstants.EU)) {
-          region = args[1];
-          pugBot.sendMessage({
-            to: channelId,
-            message: 'Region being set to ' + region
-          });
+        let newRegion = args[1];
+        let host = playerService.getHost();
+        let isValidRegion = _.includes(pugConstants.valid_regions, newRegion);
+        if(host.id = playerId) {
+          if(isValidRegion) {
+            pugService.setRegion(newRegion);
+            console.log('Region has been set to ' + newRegion);
+            pugBot.sendMessage({to: channelId, message: 'Region has been set to ' + pugService.getRegion()});
+          } else {
+            console.log('.setRegion failed ' + newRegion + 'is not a valid region');
+            pugBot.sendMessage({to: channelId, message: newRegion + ' is not a valid region'});
+          }
         }
       break;
+
       case 'voteMap':
         // vote for a map
-        // TODO
+        let mapVote = args[0];
+        let mapIndex = _.findIndex(pugConstants.map_pool, (map) => {return map.toUpperCase() == mapVote.toUpperCase();});
+        console.info(mapVote + ' ' + mapIndex);
+        if (mapIndex === -1) {
+          pugBot.sendMessage({to: channelId, message: 'invalid map'});
+          break;
+        }
+        if (playerService.getPlayerMapVote(userId) === undefined) {
+          pugBot.sendMessage({to: channelId, message: user + ' has voted for ' + mapVote});
+        }
+        pugService.voteMap(mapIndex);
+        console.log(user + 'voted for ' + mapVote);
       break;
-      case 'end':
-        //TODO
+
+      case 'mapVotes':
+        pugBot.sendMessage({to: channelId, message: 'Current map votes: ' + JSON.stringify(pugService.getMapVotes())});
       break;
+
+      case 'mapPool':
+        pugBot.sendMessage({to: channelId, message: 'Current map pool: ' + pugConstants.map_pool});
+      break;
+
       case 'help':
         pugBot.sendMessage({to: channelId, message: pugConstants.HELP_MESSAGE});
       break;
+
       case 'status':
-        pugBot.sendMessage({to: channelId, message: JSON.stringify(pugSettings.status)});
+        pugBot.sendMessage({to: channelId, message: JSON.stringify(pugService.getStatus())});
       break;
+
+      default:
+        pugBot.sendMessage({to: channelId, message: 'Command not Recognised.'});
+
      }
   }
 });

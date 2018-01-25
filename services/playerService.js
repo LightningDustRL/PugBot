@@ -16,7 +16,8 @@ const playerService = {
       username: user,
       id: userId,
       isHost: isHost,
-      isReady: false
+      isReady: false,
+      mapVote: undefined
     };
     players.push(player);
     console.log(JSON.stringify(players));
@@ -66,6 +67,9 @@ const playerService = {
       return true;
     }
     return false;
+  },
+  getPlayerMapVote: (userId) => {
+    return playerService.findPlayer(userId).mapVote;
   }
 }
 
