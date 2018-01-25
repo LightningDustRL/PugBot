@@ -175,7 +175,7 @@ pugBot.on('message', (user, userId, channelId, message, evt) => {
       break;
 
       default:
-        pugBot.sendMessage({to: channelId, message: 'Command not Recognised.'});
+        pugBot.sendMessage({to: channelId, message: 'Command not Recognized.'});
 
      }
   }
