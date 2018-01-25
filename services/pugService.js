@@ -32,6 +32,9 @@ const pugService = {
     playerService.addPlayer(user, userId, true);
     status = pugConstants.SETUP;
   },
+  getRegion: () => {
+    return region;
+  },
   setRegion: (newRegion) => {
     region = newRegion;
   },

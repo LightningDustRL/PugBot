@@ -142,6 +142,10 @@ pugBot.on('message', (user, userId, channelId, message, evt) => {
         }
       break;
 
+      case 'getRegion':
+          pugBot.sendMessage({to: channelId, message: 'Region is currently set to ' + pugService.getRegion()});
+      break;
+
       case 'voteMap':
         // vote for a map
         let mapVote = args[0];
@@ -172,6 +176,13 @@ pugBot.on('message', (user, userId, channelId, message, evt) => {
 
       case 'status':
         pugBot.sendMessage({to: channelId, message: JSON.stringify(pugService.getStatus())});
+      break;
+
+      case '.end':
+        if(playerService.getHost().id === userId){
+          pugBot.sendMessage({to: channelId, message: 'Host is abandoning the pug')});
+          pugService.setPugToDefaultValues();
+        }
       break;
 
       default:
