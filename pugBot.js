@@ -102,7 +102,8 @@ pugBot.on('message', (user, userId, channelId, message, evt) => {
                }
             });
           });
-          console.log(`Pug has begun, clearing player list and resetting pug to default values`)
+          console.log(`Pug has begun, clearing player list and resetting pug to default values`);
+          pugService.setPugToDefaultValues();
         }
       break;
 
