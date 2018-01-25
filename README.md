@@ -1,7 +1,7 @@
 # PugBot
 Discord Bot to create pick up games in Pavlov VR
 
-###List of Commands:
+### List of Commands:
 - '.setup' - Starts a new pug with you as the host. Only One pug is supported at this time
 - '.join' - Player is added to pug roster. Only Valid if Pug is looking for players
 - '.leave' - Player is removed from pug roster.
