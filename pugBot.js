@@ -89,20 +89,24 @@ pugBot.on('message', (user, userId, channelId, message, evt) => {
                 console.log(err);
               } else {
                 if (player !== playerService.getHost()) {
-                  pugBot.sendMessage({to: res.id, message: `Pug is starting! Match host is ${playerService.getHost().username}
-                      on ${pugService.getPugSettings().map.mapName} in the ${pugService.getRegion()} region. Passcode is
-                      ${pugService.getPasscode()}. Players are ${playerService.getReadyPlayerNames()}.`}
-                  );
+                  pugBot.sendMessage({
+                    to: res.id,
+                    message: 'Pug is starting! Match host is ' + playerService.getHost().username +' on '
+                    + pugService.getPugSettings().map.mapName + ' in the ' + pugService.getRegion()  + ' region. ' +
+                    'Passcode is ' + pugService.getPasscode() '. Players are ' + playerService.getReadyPlayerNames()
+                  });
                 } else {
-                  pugBot.sendMessage({to: res.id, message: `Pug is starting and you are the host. Host a game on the
-                      ${pugService.getRegion()} server on ${pugService.getPugSettings().map.mapName}, with the password
-                      ${pugService.getPasscode()} and start the match when everyone has connected.`
+                  pugBot.sendMessage({
+                    to: res.id,
+                    message: 'Pug is starting and you are the host. Host a game on the '+ pugService.getRegion()
+                    + ' server on ' + pugService.getPugSettings().map.mapName ', with the passcode '
+                    + pugService.getPasscode() + ' and start the match when everyone has connected.'
                   });
                 }
                }
             });
           });
-          console.log(`Pug has begun, clearing player list and resetting pug to default values`);
+          console.log('Pug has begun, clearing player list and resetting pug to default values');
           pugService.setPugToDefaultValues();
         }
       break;
@@ -127,10 +131,10 @@ pugBot.on('message', (user, userId, channelId, message, evt) => {
 
       case 'setRegion':
         //Set Region for pug
-        let newRegion = args[1];
+        let newRegion = args[0];
         let host = playerService.getHost();
         let isValidRegion = _.includes(pugConstants.valid_regions, newRegion);
-        if(host.id = playerId) {
+        if(host.id === userId) {
           if(isValidRegion) {
             pugService.setRegion(newRegion);
             console.log('Region has been set to ' + newRegion);
@@ -183,6 +187,7 @@ pugBot.on('message', (user, userId, channelId, message, evt) => {
           pugBot.sendMessage({to: channelId, message: 'Host is abandoning the pug'});
           pugService.setPugToDefaultValues();
         }
+        console.log('Pug ended by Host ' +userId);
       break;
 
       default:
