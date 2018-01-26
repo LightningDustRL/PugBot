@@ -178,9 +178,9 @@ pugBot.on('message', (user, userId, channelId, message, evt) => {
         pugBot.sendMessage({to: channelId, message: JSON.stringify(pugService.getStatus())});
       break;
 
-      case '.end':
+      case 'end':
         if(playerService.getHost().id === userId){
-          pugBot.sendMessage({to: channelId, message: 'Host is abandoning the pug')});
+          pugBot.sendMessage({to: channelId, message: 'Host is abandoning the pug'});
           pugService.setPugToDefaultValues();
         }
       break;
