@@ -8,7 +8,8 @@ Discord Bot to create pick up games in Pavlov VR
 - '.ready' - Player on pug Roster marks themselves as ready to begin. When all 10 players are ready, the Bot will message players with pug game Host, Map, server region, players, and passcode
 - '.unready' - Ready player unmarks themselves as ready.
 - '.players' - Prints the names of all ready and unready players on the pug roster in seperate lists
-- '.setRegion [NA, EU, AP]' Sets the region to North America, Europe, or Asia Pacific
+- '.setRegion [NA, EU, AP]' - Sets the region of the pug to North America, Europe, or Asia Pacific. Do not include brackets around your command
+  - This can only be done by the host of the pug
 - '.getRegion' - Returns the current region pug is set to
 - '.voteMap [Map]' - Registers a player's vote for map
   - the current map pool is: Dust2, Datacenter, Sand, Mirage, Nuke, and Office
