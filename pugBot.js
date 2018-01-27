@@ -36,6 +36,12 @@ pugBot.on('message', (user, userId, channelId, message, evt) => {
 
       case 'join':
         // player added to pug roster
+        let pugStatus = pugService.getStatus();
+        if (pugStatus === pugConstants.INACTIVE) {
+          pugBot.sendMessage({to: channelId, message: 'Pug setup not in progress. Type \".setup\" to start one'});
+          break;
+        }
+
         if (pugService.getStatus() === pugConstants.FULL_NOT_READY || pugService.getStatus() === pugConstants.PLAYERS_READY) {
           pugBot.sendMessage({to: channelId, message: 'Sorry, this pug is full'});
         } else {
@@ -93,13 +99,13 @@ pugBot.on('message', (user, userId, channelId, message, evt) => {
                     to: res.id,
                     message: 'Pug is starting! Match host is ' + playerService.getHost().username +' on '
                     + pugService.getPugSettings().map.mapName + ' in the ' + pugService.getRegion()  + ' region. ' +
-                    'Passcode is ' + pugService.getPasscode() '. Players are ' + playerService.getReadyPlayerNames()
+                    'Passcode is ' + pugService.getPasscode() + '. Players are ' + playerService.getReadyPlayerNames()
                   });
                 } else {
                   pugBot.sendMessage({
                     to: res.id,
                     message: 'Pug is starting and you are the host. Host a game on the '+ pugService.getRegion()
-                    + ' server on ' + pugService.getPugSettings().map.mapName ', with the passcode '
+                    + ' server on ' + pugService.getPugSettings().map.mapName + ', with the passcode '
                     + pugService.getPasscode() + ' and start the match when everyone has connected.'
                   });
                 }
