@@ -1,9 +1,9 @@
 {
   "name": "PavlovPugBot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Discord Bot for setting up pick up games in Pavlov",
   "dependencies": {
-    "discord.io": "git://github.com/woor/discord.io.git#gateway_v6",
+    "discord.js": "^11.3.0",
     "lodash": "^4.17.4"
   }
 }

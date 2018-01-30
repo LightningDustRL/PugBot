@@ -58,5 +58,5 @@ typings/
 .env
 
 .idea/
-auth.json
+auth.js
 PugBot.iml

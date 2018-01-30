@@ -13,7 +13,8 @@ Discord Bot to create pick up games in Pavlov VR
 - '.getRegion' - Returns the current region pug is set to
 - '.voteMap [Map]' - Registers a player's vote for map
   - the current map pool is: Dust2, Datacenter, Sand, Mirage, Nuke, and Office
-- '.mapVotes' - returns the curent maps and their respective votes
+- '.currentMap' - returns the current map leading in votes, if no votes, returns "host's choice"
+- '.allMapVotes' - returns all maps in the pool and their votes
 - '.mapPool' - returns the current map pool
 - '.help' - provides a link to this readme
 - '.status' - returns the current pug status
