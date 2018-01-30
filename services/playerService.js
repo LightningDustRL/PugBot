@@ -11,32 +11,36 @@ const playerService = {
   getHost: () => {
     return _.find(playerService.getPlayers(), (player) => {return player.isHost === true});
   },
-  addPlayer: (user, userId, isHost) => {
+  addPlayer: (user, isHost) => {
     let player = {
-      username: user,
-      id: userId,
+      user: user,
       isHost: isHost,
       isReady: false,
-      mapVote: undefined
+      mapVote: 'none'
     };
     players.push(player);
-    console.log(JSON.stringify(players));
+    console.log({
+      user: player.user.username,
+      isHost: player.isHost,
+      isReady: player.isReady,
+      mapVote: player.mapVote
+    });
   },
-  removePlayer: (userId) => {
+  removePlayer: (user) => {
     _.remove(players, (player) => {
-      return player.id === userId;
+      return player.id === user.id;
     });
     console.log(JSON.stringify(players));
   },
-  readyPlayer: (userId) => {
-    const playerIndex = _.findIndex(players, (player) => {return player.id === userId});
-    players[playerIndex].isReady = true;
-    console.log('Ready player: ' + JSON.stringify(players[playerIndex]));
+  readyPlayer: (user) => {
+    let player = playerService.findPlayer(user);
+    _.assign(player, player.isReady = true);
+    console.log('Ready player: ' + JSON.stringify({user: player.user.username, isHost: player.isHost, isReady: player.isReady, mapVote: player.mapVote}));
   },
-  unreadyPlayer: (userId) => {
-    const playerIndex = _.findIndex(players, (player) => {return player.id === userId});
-    players[playerIndex].isReady = false;
-    console.log('Unready player: ' + JSON.stringify(players[playerIndex]));
+  unreadyPlayer: (user) => {
+    let player = playerService.findPlayer(user);
+    _.assign(player, player.isReady = false);
+    console.log('Unready player: ' + JSON.stringify({user: player.user.username, isHost: player.isHost, isReady: player.isReady, mapVote: player.mapVote}));
   },
   clearPlayers: () => {
     players = [];
@@ -48,28 +52,32 @@ const playerService = {
   getReadyPlayerNames: () => {
   let readyPlayers = [];
     _.forEach(_.filter(players, (player) => {return player.isReady;}), (player) => {
-      readyPlayers.push(player.username);
+      readyPlayers.push(player.user.username);
     });
     return readyPlayers;
   },
   getUnreadyPlayerNames: () => {
     let unreadyPlayers = [];
     _.forEach(_.filter(players, (player) => {return !player.isReady;}), (player) => {
-      unreadyPlayers.push(player.username);
+      unreadyPlayers.push(player.user.username);
     });
     return unreadyPlayers;
   },
-  findPlayer: (userId) => {
-    return _.find(playerService.getPlayers(), (player) => {return userId === player.id});
+  findPlayer: (user) => {
+    return _.find(players, (player) => {return user.id === player.user.id});
   },
-  playerExists: (userId) => {
-    if (playerService.findPlayer(userId) !== undefined) {
+  playerExists: (user) => {
+    if (playerService.findPlayer(user) !== undefined) {
       return true;
     }
     return false;
   },
-  getPlayerMapVote: (userId) => {
-    return playerService.findPlayer(userId).mapVote;
+  getPlayerMapVote: (user) => {
+    return playerService.findPlayer(user).mapVote;
+  },
+  voteMap: (mapName, user) => {
+    let player = playerService.findPlayer(user);
+    _.assign(player, player.mapVote = mapName);
   }
 }
 
