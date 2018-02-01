@@ -7,9 +7,11 @@ let mapSettings = [];
 let status = pugConstants.INACTIVE;
 let region;
 let passcode;
+let host;
 
 const pugService = {
   setPugToDefaultValues: () => {
+    host = 'none';
     playerService.clearPlayers();
     mapSettings = [];
     _.forEach(pugConstants.map_pool, (mapName) => {
@@ -31,9 +33,26 @@ const pugService = {
     return mapSettings;
   },
   setupPug: (user) => {
-    pugService.setPugToDefaultValues();
+    host = user;
     playerService.addPlayer(user, true);
     status = pugConstants.SETUP;
+  },
+  startPug: () => {
+    _.forEach(playerService.getPlayers(), (player) => {
+      console.log('Opening DMs with ' + playerService.getReadyPlayerNames());
+      if (player !== playerService.getHost()) {
+        player.user.send('Pug is starting! Match host is ' + playerService.getHost().user.username +' on '
+          + pugService.getCurrentMap() + ' in the ' + pugService.getRegion()  + ' region. ' +
+          'Passcode is ' + pugService.getPasscode());
+      } else {
+        player.user.send('Pug is starting and you are the host. Host a game on the '+ pugService.getRegion()
+          + ' server on ' + pugService.getCurrentMap() + ', with the passcode '
+          + pugService.getPasscode() + ' and start the match when everyone has connected.'
+        );
+      }
+    });
+    console.log('Pug has begun, clearing player list and resetting pug to default values');
+    pugService.setPugToDefaultValues();
   },
   getRegion: () => {
     return region;
@@ -62,8 +81,10 @@ const pugService = {
     if (mapSettings[0].votes === 0) {
       return 'Host\'s choice';
     }
-
     return mapSettings[0].mapName;
+  },
+  getHost: () => {
+    return host;
   }
 }
 
