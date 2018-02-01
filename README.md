@@ -18,4 +18,5 @@ Discord Bot to create pick up games in Pavlov VR
 - '.mapPool' - returns the current map pool
 - '.help' - provides a link to this readme
 - '.status' - returns the current pug status
+- '.start' - force start the pug with the current players
 - '.end' - Ends the pug being set up
